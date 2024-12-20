@@ -35,7 +35,7 @@ async def add_command(message: Message, command: CommandObject) -> None:
 @dp.message(Command("получить"))
 async def get_command(message: Message, command: CommandObject) -> None:
     if command.args is None:
-        await command.answer("Не передан аргумент. Формат: 'Абривиатура'")
+        await message.answer("Не передан аргумент. Формат: 'Абривиатура'")
     else:
         abbr = command.args.strip()
         explanation = await db.get(abbr)
