@@ -6,7 +6,10 @@
 
 ```dotenv
 TOKEN={Токен бота из @botfather}
+PRETTY=true
 ```
+
+`PRETTY` отвечает за формат сохранения данных. Если не указан/false - будет minified, иначе - pretty-print. 
 
 ## Локальный запуск
 

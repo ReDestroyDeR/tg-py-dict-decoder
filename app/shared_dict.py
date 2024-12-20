@@ -49,8 +49,8 @@ def load_dict() -> SharedStrDict:
         return SharedStrDict()
 
 
-async def save_dict(shared_dict: SharedStrDict) -> None:
+async def save_dict(shared_dict: SharedStrDict, pretty: bool) -> None:
     copy = await shared_dict.clone_data()
     with open(__path, 'w', encoding='utf-8') as f:
-        json.dump({__dict_key: copy}, f, ensure_ascii=False)
+        json.dump({__dict_key: copy}, f, ensure_ascii=False, indent=(2 if pretty else None))
 

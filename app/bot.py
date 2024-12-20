@@ -27,7 +27,7 @@ async def add_command(message: Message, command: CommandObject) -> None:
         await message.answer("Не переданы аргументы. Формат: 'Абривиатура | Расшифровка'")
     else:
         exploded = list(map(str.strip, command.args.split("|")))
-        (abbr, explanation) = (exploded[0], exploded[1])
+        (abbr, explanation) = (exploded[0].upper(), exploded[1])
         await db.append(abbr, explanation)
         await message.answer(f"Сохранил расшифровку {abbr} = {explanation}")
 
@@ -37,7 +37,7 @@ async def get_command(message: Message, command: CommandObject) -> None:
     if command.args is None:
         await message.answer("Не передан аргумент. Формат: 'Абривиатура'")
     else:
-        abbr = command.args.strip()
+        abbr = command.args.strip().upper()
         explanation = await db.get(abbr)
         await message.answer(f"Получил расшифровку {abbr} = {explanation}")
 
@@ -54,7 +54,8 @@ async def main() -> None:
 
         await dp.start_polling(bot)
     finally:
-        await save_dict(db)
+        pretty = (os.getenv("PRETTY") or "false").lower() == "true"
+        await save_dict(db, pretty)
 
 
 if __name__ == "__main__":
