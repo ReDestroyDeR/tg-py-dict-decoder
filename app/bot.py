@@ -9,7 +9,7 @@ from aiogram.enums import ParseMode
 from aiogram.types import Message
 from dotenv import load_dotenv
 
-from shared_dict import load_dict, save_dict
+from shared_dict import load_dict
 
 dp = Dispatcher()
 db = load_dict()
@@ -18,7 +18,7 @@ maintainer = os.getenv("MAINTAINER")
 @dp.message()
 async def get_command(message: Message) -> None:
     abbr = message.args.strip().upper()
-    explanation = await db.get(abbr)
+    explanation = db.get(abbr)
     if explanation is None:
         await message.answer(
             f"Я пока не знаю что такое: {abbr} 😨" +
@@ -29,19 +29,15 @@ async def get_command(message: Message) -> None:
 
 
 async def main() -> None:
-    try:
-        load_dotenv(".env")
-        token = str(os.getenv("TOKEN"))
+    load_dotenv(".env")
+    token = str(os.getenv("TOKEN"))
 
-        if len(token.strip()) == 0:
-            print("Missing TOKEN Env var")
-            exit(1)
-        bot = Bot(token=token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+    if len(token.strip()) == 0:
+        print("Missing TOKEN Env var")
+        exit(1)
+    bot = Bot(token=token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 
-        await dp.start_polling(bot)
-    finally:
-        pretty = (os.getenv("PRETTY") or "false").lower() == "true"
-        await save_dict(db, pretty)
+    await dp.start_polling(bot)
 
 
 if __name__ == "__main__":

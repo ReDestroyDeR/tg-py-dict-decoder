@@ -1,7 +1,5 @@
 import json
-from os import makedirs
-from os.path import exists, dirname
-from asyncio import Lock
+from os.path import exists
 
 
 class SharedStrDict:
@@ -11,29 +9,9 @@ class SharedStrDict:
         if data is None:
             data = {}
         self.__data = data
-        self.__lock = Lock()
 
-    async def clone_data(self) -> dict[str, str]:
-        return await self.__over_dict(dict.copy)
-
-    async def append(self, key: str, value: str) -> None:
-        def __append(d: dict[str, str]) -> None:
-            d[key] = value
-
-        await self.__over_dict(__append)
-
-    async def get(self, key: str) -> str | None:
-        def __get(d: dict[str, str]) -> str | None:
-            return d.get(key)
-
-        return await self.__over_dict(__get)
-
-    async def __over_dict(self, fun):
-        await self.__lock.acquire()
-        try:
-            return fun(self.__data)
-        finally:
-            self.__lock.release()
+    def get(self, key: str) -> str | None:
+        return self.__data.get(key)
 
 
 __path = 'data/abbr.json'
@@ -48,11 +26,3 @@ def load_dict() -> SharedStrDict:
             return SharedStrDict(data)
     else:
         return SharedStrDict()
-
-
-async def save_dict(shared_dict: SharedStrDict, pretty: bool) -> None:
-    copy = await shared_dict.clone_data()
-    makedirs(dirname(__path), exist_ok=True)
-    with open(__path, 'w+', encoding='utf-8') as f:
-        json.dump({__dict_key: copy}, f, ensure_ascii=False, indent=(2 if pretty else None))
-
